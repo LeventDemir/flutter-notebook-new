@@ -39,42 +39,51 @@ class _HomeState extends State<Home> {
   }
 
   void remove(int id, context) {
-    dbHelper.remove(id);
+    ValueNotifier<bool> permission = ValueNotifier<bool>(true);
 
-    setState(() => notes);
+    permission.addListener(() => {getNotes()});
+
+    Future.delayed(
+      const Duration(seconds: 5),
+      () => {permission.value ? dbHelper.remove(id) : getNotes()},
+    );
 
     FToast fToast = FToast();
     fToast.init(context);
 
     fToast.showToast(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25.0),
           color: Colors.red[400],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.delete_forever_rounded, color: Colors.white),
-            SizedBox(width: 12.0),
-            Text(
-              "Note Deleted",
-              style: TextStyle(
-                color: Colors.white,
+          children: [
+            const Icon(Icons.delete_forever_rounded, color: Colors.white),
+            const SizedBox(width: 12.0),
+            const Text("Note Deleted", style: TextStyle(color: Colors.white)),
+            TextButton(
+              onPressed: () => setState(() => permission.value = false),
+              child: Text(
+                '▏UNDO',
+                style: TextStyle(
+                  color: Colors.grey.shade200,
+                ),
               ),
-            ),
+              style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
+            )
           ],
         ),
       ),
       gravity: ToastGravity.BOTTOM,
-      toastDuration: const Duration(seconds: 3),
+      toastDuration: const Duration(seconds: 4),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    getNotes();
     return Scaffold(
       appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
       body: ListView.builder(
