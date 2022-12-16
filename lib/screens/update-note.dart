@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notebook/database/index.dart';
+import 'package:notebook/models/note.dart';
 
 class UpdateNote extends StatefulWidget {
   const UpdateNote({super.key});
@@ -17,6 +20,7 @@ class _UpdateNoteState extends State<UpdateNote> {
   final _picker = ImagePicker();
   late String _image = '';
   XFile? _pickedFile;
+  Note? note;
 
   Future<void> _showPhotoSources() async {
     return showDialog<void>(
@@ -67,8 +71,61 @@ class _UpdateNoteState extends State<UpdateNote> {
     );
   }
 
+  void update() {
+    if (_formKey.currentState!.validate()) {
+      DbHelper dbHelper = DbHelper();
+
+      Note x = Note(
+        id: note!.id,
+        title: _titleEditingController.text,
+        description: _descriptionEditingController.text,
+        photo: _image,
+        date: note!.date,
+      );
+
+      dbHelper.update(x);
+
+      Navigator.pop(context);
+
+      FToast fToast = FToast();
+
+      fToast.init(context);
+
+      fToast.showToast(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25.0),
+            color: Colors.green[400],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.check, color: Colors.white),
+              SizedBox(width: 12.0),
+              Text(
+                "Note Created",
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: const Duration(seconds: 3),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_formKey.currentState == null) {
+      note = ModalRoute.of(context)!.settings.arguments as Note;
+
+      _image = note!.photo!;
+      _titleEditingController.text = note!.title;
+      _descriptionEditingController.text = note!.description!;
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
       body: SingleChildScrollView(
@@ -150,7 +207,7 @@ class _UpdateNoteState extends State<UpdateNote> {
                   ),
                 ),
                 child: const Text("Update", style: TextStyle(fontSize: 17)),
-                onPressed: () => {},
+                onPressed: update,
               ),
             ],
           ),

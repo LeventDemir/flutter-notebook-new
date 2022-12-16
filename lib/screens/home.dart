@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -31,7 +33,6 @@ class _HomeState extends State<Home> {
           _notes.add(Note.formString(data[i]));
         }
 
-        debugPrint(_notes.toString());
         setState(() => notes = _notes);
       });
     });
@@ -113,6 +114,10 @@ class _HomeState extends State<Home> {
             child: Card(
               elevation: 4,
               child: ListTile(
+                leading: notes[index].photo == null
+                    ? null
+                    : CircleAvatar(
+                        backgroundImage: FileImage(File(notes[index].photo))),
                 title: Text(
                   notes[index].title,
                   overflow: TextOverflow.ellipsis,

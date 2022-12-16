@@ -75,7 +75,9 @@ class _CreateNoteState extends State<CreateNote> {
       DbHelper dbHelper = DbHelper();
 
       Note note = Note(
+        photo: _image,
         title: _titleEditingController.text,
+        description: _descriptionEditingController.text,
         date: DateTime.now().toIso8601String(),
       );
 
@@ -100,9 +102,7 @@ class _CreateNoteState extends State<CreateNote> {
               SizedBox(width: 12.0),
               Text(
                 "Note Created",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ],
           ),
