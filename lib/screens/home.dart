@@ -84,6 +84,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    getNotes();
     return Scaffold(
       appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
       body: ListView.builder(
@@ -123,7 +124,7 @@ class _HomeState extends State<Home> {
             child: Card(
               elevation: 4,
               child: ListTile(
-                leading: notes[index].photo == null
+                leading: notes[index].photo == ''
                     ? null
                     : CircleAvatar(
                         backgroundImage: FileImage(File(notes[index].photo))),

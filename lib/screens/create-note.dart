@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notebook/database/index.dart';
 import 'package:notebook/models/note.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CreateNote extends StatefulWidget {
   const CreateNote({super.key});
@@ -17,9 +20,63 @@ class _CreateNoteState extends State<CreateNote> {
   final _formKey = GlobalKey<FormState>();
   final _titleEditingController = TextEditingController();
   final _descriptionEditingController = TextEditingController();
+  final recorder = FlutterSoundRecorder();
+  final audioPlayer = FlutterSoundPlayer();
   final _picker = ImagePicker();
   late String _image = '';
   XFile? _pickedFile;
+  bool isRecordReady = false;
+  Duration? duration;
+  double sliderPosition = 0;
+  bool isAudioReady = false;
+  File? audioFile;
+
+  @override
+  void initState() {
+    super.initState();
+
+    initRecorder();
+  }
+
+  @override
+  void dispose() {
+    recorder.stopRecorder();
+
+    audioPlayer.closePlayer();
+
+    super.dispose();
+  }
+
+  Future initRecorder() async {
+    final status = await Permission.microphone.request();
+
+    if (status != PermissionStatus.granted) {
+      throw "Microphone permission not granted!";
+    }
+
+    await recorder.openRecorder();
+
+    await audioPlayer.openPlayer();
+
+    isRecordReady = true;
+
+    recorder.setSubscriptionDuration(const Duration(milliseconds: 500));
+  }
+
+  Future startRecord() async {
+    if (!isRecordReady) return;
+
+    await recorder.startRecorder(toFile: "audio.mp4");
+  }
+
+  Future stopRecord() async {
+    if (!isRecordReady) return;
+
+    final path = await recorder.stopRecorder();
+    audioFile = File(path!);
+
+    debugPrint(audioFile!.path.toString());
+  }
 
   Future<void> _showPhotoSources() async {
     return showDialog<void>(
@@ -187,6 +244,129 @@ class _CreateNoteState extends State<CreateNote> {
                       ],
                     )
                   : const SizedBox(height: 0),
+              SizedBox(height: _image != '' ? 25 : 10),
+              isAudioReady
+                  ? Card(
+                      color: Colors.indigo.shade100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 2),
+                          IconButton(
+                            onPressed: () async {
+                              if (audioPlayer.isPlaying) {
+                                await audioPlayer.pausePlayer();
+                              } else if (audioPlayer.isPaused) {
+                                await audioPlayer.resumePlayer();
+                              } else {
+                                await audioPlayer.startPlayer(
+                                  fromURI: audioFile!.path,
+                                  whenFinished: () => setState(() {}),
+                                );
+                              }
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              audioPlayer.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              size: 30,
+                              color: Colors.indigo.shade800,
+                            ),
+                          ),
+                          Slider(
+                              min: 0,
+                              max: duration!.inSeconds.toDouble(),
+                              value: sliderPosition,
+                              onChanged: (double value) {
+                                setState(() {
+                                  sliderPosition = value;
+                                });
+                              }),
+                          IconButton(
+                            color: Colors.redAccent,
+                            onPressed: () => {
+                              audioFile = null,
+                              setState(() => isAudioReady = false),
+                            },
+                            icon: const Icon(Icons.delete),
+                          ),
+                        ],
+                      ),
+                    )
+                  : recorder.isRecording
+                      ? OutlinedButton(
+                          onPressed: () async {
+                            await stopRecord();
+
+                            setState(() => isAudioReady = true);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            primary: Colors.redAccent.shade400,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            side: BorderSide(
+                              width: 3,
+                              color: Colors.redAccent.shade400,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(50)),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.stop_circle_outlined,
+                                color: Colors.redAccent.shade400,
+                              ),
+                              const SizedBox(width: 10),
+                              StreamBuilder<RecordingDisposition>(
+                                stream: recorder.onProgress,
+                                builder: (context, snapshot) {
+                                  duration = snapshot.hasData
+                                      ? snapshot.data!.duration
+                                      : Duration.zero;
+                                  return Text(
+                                    Duration(seconds: duration!.inSeconds)
+                                            .toString()
+                                            .split(':')
+                                            .removeAt(1)
+                                            .toString() +
+                                        ":" +
+                                        Duration(seconds: duration!.inSeconds)
+                                            .toString()
+                                            .split(':')
+                                            .removeAt(2)
+                                            .split('.')
+                                            .removeAt(0)
+                                            .toString(),
+                                    style: const TextStyle(fontSize: 18),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: () async {
+                            await startRecord();
+
+                            setState(() {});
+                          },
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            side: const BorderSide(
+                                width: 3, color: Colors.indigo),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(50)),
+                            ),
+                          ),
+                          child: const Icon(Icons.mic_rounded),
+                        ),
               const SizedBox(height: 30),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
