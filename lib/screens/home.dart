@@ -14,7 +14,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List notes = [];
-  DbHelper dbHelper = new DbHelper();
+  DbHelper dbHelper = DbHelper();
 
   @override
   void initState() {
@@ -65,13 +65,13 @@ class _HomeState extends State<Home> {
             const Text("Note Deleted", style: TextStyle(color: Colors.white)),
             TextButton(
               onPressed: () => setState(() => permission.value = false),
+              style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
               child: Text(
                 '▏UNDO',
                 style: TextStyle(
                   color: Colors.grey.shade200,
                 ),
               ),
-              style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
             )
           ],
         ),

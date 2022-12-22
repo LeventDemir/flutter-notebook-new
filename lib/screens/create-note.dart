@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -306,7 +308,7 @@ class _CreateNoteState extends State<CreateNote> {
                             setState(() => isAudioReady = true);
                           },
                           style: OutlinedButton.styleFrom(
-                            primary: Colors.redAccent.shade400,
+                            foregroundColor: Colors.redAccent.shade400,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             side: BorderSide(
                               width: 3,
@@ -332,19 +334,7 @@ class _CreateNoteState extends State<CreateNote> {
                                       ? snapshot.data!.duration
                                       : Duration.zero;
                                   return Text(
-                                    Duration(seconds: duration!.inSeconds)
-                                            .toString()
-                                            .split(':')
-                                            .removeAt(1)
-                                            .toString() +
-                                        ":" +
-                                        Duration(seconds: duration!.inSeconds)
-                                            .toString()
-                                            .split(':')
-                                            .removeAt(2)
-                                            .split('.')
-                                            .removeAt(0)
-                                            .toString(),
+                                    "${Duration(seconds: duration!.inSeconds).toString().split(':').removeAt(1)}:${Duration(seconds: duration!.inSeconds).toString().split(':').removeAt(2).split('.').removeAt(0)}",
                                     style: const TextStyle(fontSize: 18),
                                   );
                                 },
@@ -377,8 +367,8 @@ class _CreateNoteState extends State<CreateNote> {
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                 ),
-                child: const Text("Create", style: TextStyle(fontSize: 17)),
                 onPressed: create,
+                child: const Text("Create", style: TextStyle(fontSize: 17)),
               ),
             ],
           ),

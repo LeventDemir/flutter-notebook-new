@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:io';
 import 'dart:async';
 import 'dart:math';
@@ -308,7 +310,7 @@ class _UpdateNoteState extends State<UpdateNote> {
                             setState(() => isAudioReady = true);
                           },
                           style: OutlinedButton.styleFrom(
-                            primary: Colors.redAccent.shade400,
+                            foregroundColor: Colors.redAccent.shade400,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             side: BorderSide(
                               width: 3,
@@ -334,19 +336,7 @@ class _UpdateNoteState extends State<UpdateNote> {
                                       ? snapshot.data!.duration
                                       : Duration.zero;
                                   return Text(
-                                    Duration(seconds: duration!.inSeconds)
-                                            .toString()
-                                            .split(':')
-                                            .removeAt(1)
-                                            .toString() +
-                                        ":" +
-                                        Duration(seconds: duration!.inSeconds)
-                                            .toString()
-                                            .split(':')
-                                            .removeAt(2)
-                                            .split('.')
-                                            .removeAt(0)
-                                            .toString(),
+                                    "${Duration(seconds: duration!.inSeconds).toString().split(':').removeAt(1)}:${Duration(seconds: duration!.inSeconds).toString().split(':').removeAt(2).split('.').removeAt(0)}",
                                     style: const TextStyle(fontSize: 18),
                                   );
                                 },
@@ -379,8 +369,8 @@ class _UpdateNoteState extends State<UpdateNote> {
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                 ),
-                child: const Text("Update", style: TextStyle(fontSize: 17)),
                 onPressed: update,
+                child: const Text("Update", style: TextStyle(fontSize: 17)),
               ),
             ],
           ),

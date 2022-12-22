@@ -24,16 +24,14 @@ class DbHelper {
   static Database? _db;
 
   Future<Database?> get db async {
-    if (_db == null) {
-      _db = await initalizeDb();
-    }
+    _db ??= await initalizeDb();
 
     return _db;
   }
 
   Future<Database> initalizeDb() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + "note.db";
+    String path = "${directory.path}note.db";
 
     var dbData = await openDatabase(path, version: 1, onCreate: _createDb);
 
