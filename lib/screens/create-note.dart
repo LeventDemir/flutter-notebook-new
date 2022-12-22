@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +7,7 @@ import 'package:notebook/database/index.dart';
 import 'package:notebook/models/note.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:math';
 
 class CreateNote extends StatefulWidget {
   const CreateNote({super.key});
@@ -66,7 +66,8 @@ class _CreateNoteState extends State<CreateNote> {
   Future startRecord() async {
     if (!isRecordReady) return;
 
-    await recorder.startRecorder(toFile: "audio.mp4");
+    final filename = 1000 + Random().nextInt(10000);
+    await recorder.startRecorder(toFile: "$filename.mp4");
   }
 
   Future stopRecord() async {
@@ -132,6 +133,7 @@ class _CreateNoteState extends State<CreateNote> {
       DbHelper dbHelper = DbHelper();
 
       Note note = Note(
+        audio: audioFile?.path,
         photo: _image,
         title: _titleEditingController.text,
         description: _descriptionEditingController.text,

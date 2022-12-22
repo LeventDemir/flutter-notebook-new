@@ -3,6 +3,7 @@ class Note {
   final String title;
   final String? description;
   final String? photo;
+  final String? audio;
   final String date;
 
   Note({
@@ -10,6 +11,7 @@ class Note {
     required this.title,
     this.description,
     this.photo,
+    this.audio,
     required this.date,
   });
 
@@ -17,6 +19,7 @@ class Note {
         'title': title,
         'description': description,
         'photo': photo,
+        'audio': audio,
         'date': date,
       };
 
@@ -25,6 +28,7 @@ class Note {
         title: value['title'],
         description: value['description'],
         photo: value['photo'],
+        audio: value['audio'],
         date: value['date'],
       );
 }
