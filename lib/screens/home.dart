@@ -27,6 +27,7 @@ class _HomeState extends State<Home> {
     db.then((result) {
       var noteFuture = dbHelper.getNotes();
       noteFuture.then((data) {
+        // ignore: no_leading_underscores_for_local_identifiers
         List _notes = [];
         for (int i = 0; i < data!.length; i++) {
           _notes.add(Note.formString(data[i]));
@@ -64,13 +65,14 @@ class _HomeState extends State<Home> {
             const SizedBox(width: 12.0),
             const Text("Note Deleted", style: TextStyle(color: Colors.white)),
             TextButton(
-              onPressed: () => setState(() => permission.value = false),
+              onPressed: () => {
+                setState(() => permission.value = false),
+                fToast.removeCustomToast()
+              },
               style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
               child: Text(
-                '▏UNDO',
-                style: TextStyle(
-                  color: Colors.grey.shade200,
-                ),
+                '│UNDO',
+                style: TextStyle(color: Colors.grey.shade200),
               ),
             )
           ],

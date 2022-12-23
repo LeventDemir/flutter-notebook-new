@@ -29,7 +29,6 @@ class _UpdateNoteState extends State<UpdateNote> {
   Note? note;
   bool isRecordReady = false;
   Duration? duration;
-  double sliderPosition = 0;
   bool isAudioReady = false;
   File? audioFile;
   String? audioPath;
@@ -198,12 +197,18 @@ class _UpdateNoteState extends State<UpdateNote> {
             children: [
               TextFormField(
                 controller: _titleEditingController,
-                decoration: const InputDecoration(
-                  enabledBorder: OutlineInputBorder(
+                onChanged: (e) => setState(() {}),
+                decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.indigo),
                   ),
                   labelText: 'Title',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(
+                    color: _titleEditingController.text.isEmpty
+                        ? Colors.indigo.shade200
+                        : Colors.indigo,
+                  ),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) return 'This field is required';
@@ -214,13 +219,19 @@ class _UpdateNoteState extends State<UpdateNote> {
               const SizedBox(height: 20),
               TextFormField(
                 controller: _descriptionEditingController,
+                onChanged: (e) => setState(() {}),
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  enabledBorder: OutlineInputBorder(
+                decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.indigo),
                   ),
                   labelText: 'Description',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(
+                    color: _descriptionEditingController.text.isEmpty
+                        ? Colors.indigo.shade200
+                        : Colors.indigo,
+                  ),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
@@ -268,29 +279,57 @@ class _UpdateNoteState extends State<UpdateNote> {
                       ),
                       child: Row(
                         children: [
-                          const SizedBox(width: 2),
+                          const Spacer(flex: 4),
                           IconButton(
                             onPressed: () async {
-                              if (audioPlayer.isPlaying) {
-                                await audioPlayer.pausePlayer();
-                              } else if (audioPlayer.isPaused) {
+                              if (audioPlayer.isPaused) {
                                 await audioPlayer.resumePlayer();
-                              } else {
+                              } else if (audioPlayer.isStopped) {
                                 await audioPlayer.startPlayer(
                                   fromURI: audioFile?.path ?? audioPath,
                                   whenFinished: () => setState(() {}),
                                 );
                               }
+
                               setState(() {});
                             },
                             icon: Icon(
-                              audioPlayer.isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              size: 30,
-                              color: Colors.indigo.shade800,
+                              Icons.play_arrow,
+                              size: audioPlayer.isPlaying ? 35 : 30,
+                              color: audioPlayer.isPlaying
+                                  ? Colors.indigo.shade400
+                                  : Colors.indigo.shade800,
                             ),
                           ),
+                          IconButton(
+                            onPressed: () async {
+                              if (audioPlayer.isPlaying) {
+                                await audioPlayer.pausePlayer();
+                              }
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              Icons.pause,
+                              size: audioPlayer.isPaused ? 30 : 25,
+                              color: audioPlayer.isPaused
+                                  ? Colors.indigo.shade400
+                                  : Colors.indigo.shade800,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              await audioPlayer.stopPlayer();
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              Icons.stop_circle_outlined,
+                              size: audioPlayer.isStopped ? 30 : 25,
+                              color: audioPlayer.isStopped
+                                  ? Colors.indigo.shade400
+                                  : Colors.indigo.shade800,
+                            ),
+                          ),
+                          const Spacer(),
                           IconButton(
                             color: Colors.redAccent,
                             onPressed: () => {
@@ -299,6 +338,7 @@ class _UpdateNoteState extends State<UpdateNote> {
                             },
                             icon: const Icon(Icons.delete),
                           ),
+                          const SizedBox(width: 7)
                         ],
                       ),
                     )
@@ -364,7 +404,7 @@ class _UpdateNoteState extends State<UpdateNote> {
               const SizedBox(height: 30),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
