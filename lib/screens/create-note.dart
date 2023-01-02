@@ -174,17 +174,6 @@ class _CreateNoteState extends State<CreateNote> {
     }
   }
 
-  // Future<void> setPos(int d) async {
-  //   if (d > duration!.inSeconds) d = duration!.inSeconds;
-
-  //   setState(() => sliderPosition = d);
-  // }
-
-  // Future<void> seek(double d) async {
-  //   await audioPlayer.seekToPlayer(Duration(seconds: d.floor()));
-  //   await setPos(d.toInt());
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -280,35 +269,6 @@ class _CreateNoteState extends State<CreateNote> {
                       ),
                       child: Row(
                         children: [
-                          // const SizedBox(width: 2),
-                          // IconButton(
-                          //   onPressed: () async {
-                          //     if (audioPlayer.isPlaying) {
-                          //       await audioPlayer.pausePlayer();
-                          //     } else if (audioPlayer.isPaused) {
-                          //       await audioPlayer.resumePlayer();
-                          //     } else {
-                          //       await audioPlayer.startPlayer(
-                          //         fromURI: audioFile!.path,
-                          //         whenFinished: () => setState(() {}),
-                          //       );
-                          //     }
-                          //     setState(() {});
-                          //   },
-                          //   icon: Icon(
-                          //     audioPlayer.isPlaying
-                          //         ? Icons.pause
-                          //         : Icons.play_arrow,
-                          //     size: 30,
-                          //     color: Colors.indigo.shade800,
-                          //   ),
-                          // ),
-                          // Slider(
-                          //   min: 0,
-                          //   max: duration!.inSeconds.toDouble(),
-                          //   value: sliderPosition.toDouble(),
-                          //   onChanged: seek,
-                          // ),
                           const Spacer(flex: 4),
                           IconButton(
                             onPressed: () async {

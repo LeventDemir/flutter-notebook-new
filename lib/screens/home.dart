@@ -85,9 +85,20 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    getNotes();
     return Scaffold(
-      appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Notebook'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Theme.of(context).brightness.name == 'light'
+                ? const Icon(Icons.wb_sunny_rounded)
+                : const Icon(Icons.nightlight_round_sharp),
+          ),
+          const SizedBox(width: 5)
+        ],
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(8),
         itemCount: notes.length,
