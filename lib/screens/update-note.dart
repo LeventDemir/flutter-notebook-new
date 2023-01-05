@@ -9,6 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:notebook/database/index.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:notebook/models/note.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../store/theme.dart';
 
 class UpdateNote extends StatefulWidget {
   const UpdateNote({super.key});
@@ -32,6 +36,7 @@ class _UpdateNoteState extends State<UpdateNote> {
   bool isAudioReady = false;
   File? audioFile;
   String? audioPath;
+  late ThemeProvider theme;
 
   @override
   void initState() {
@@ -172,6 +177,8 @@ class _UpdateNoteState extends State<UpdateNote> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Provider.of<ThemeProvider>(context);
+
     if (_formKey.currentState == null) {
       note = ModalRoute.of(context)!.settings.arguments as Note;
 
@@ -187,7 +194,27 @@ class _UpdateNoteState extends State<UpdateNote> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Notebook'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              theme.changeTheme();
+
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              prefs.setString('theme', theme.themeMode.name);
+            },
+            icon: Icon(
+              theme.themeMode.name == 'light'
+                  ? Icons.wb_sunny_rounded
+                  : Icons.nightlight_round_sharp,
+            ),
+          ),
+          const SizedBox(width: 5)
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Form(
@@ -333,6 +360,7 @@ class _UpdateNoteState extends State<UpdateNote> {
                           IconButton(
                             color: Colors.redAccent,
                             onPressed: () => {
+                              audioPlayer.stopPlayer(),
                               audioFile = null,
                               setState(() => isAudioReady = false),
                             },

@@ -9,7 +9,12 @@ import 'package:notebook/database/index.dart';
 import 'package:notebook/models/note.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../store/theme.dart';
 
 class CreateNote extends StatefulWidget {
   const CreateNote({super.key});
@@ -32,6 +37,7 @@ class _CreateNoteState extends State<CreateNote> {
   int sliderPosition = 0;
   bool isAudioReady = false;
   File? audioFile;
+  late ThemeProvider theme;
 
   @override
   void initState() {
@@ -176,8 +182,30 @@ class _CreateNoteState extends State<CreateNote> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Notebook'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Notebook'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              theme.changeTheme();
+
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              prefs.setString('theme', theme.themeMode.name);
+            },
+            icon: Icon(
+              theme.themeMode.name == 'light'
+                  ? Icons.wb_sunny_rounded
+                  : Icons.nightlight_round_sharp,
+            ),
+          ),
+          const SizedBox(width: 5)
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Form(
@@ -323,6 +351,7 @@ class _CreateNoteState extends State<CreateNote> {
                           IconButton(
                             color: Colors.redAccent,
                             onPressed: () => {
+                              audioPlayer.stopPlayer(),
                               audioFile = null,
                               setState(() => isAudioReady = false),
                             },

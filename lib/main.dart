@@ -3,32 +3,36 @@ import 'package:flutter/services.dart';
 import 'package:notebook/screens/create-note.dart';
 import 'package:notebook/screens/home.dart';
 import 'package:notebook/screens/update-note.dart';
+import 'package:notebook/store/theme.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const App());
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (context) => ThemeProvider())],
+      child: const App(),
+    ),
+  );
+}
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ThemeMode theme = Provider.of<ThemeProvider>(context).themeMode;
+
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: Theme.of(context).brightness.name == 'light'
-            ? Colors.indigo
-            : Colors.indigo.shade900,
-      ),
+      SystemUiOverlayStyle(systemNavigationBarColor: Colors.indigo.shade700),
     );
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: Colors.indigo,
-      ),
+      themeMode: theme,
+      theme: ThemeData(primarySwatch: Colors.indigo),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.indigo.shade900),
+        appBarTheme: AppBarTheme(backgroundColor: Colors.indigo.shade700),
         colorSchemeSeed: Colors.indigo,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -37,9 +41,10 @@ class App extends StatelessWidget {
           ),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.indigo.shade900,
+          backgroundColor: Colors.indigo.shade700,
           foregroundColor: Colors.white,
         ),
+        cardColor: Colors.indigo,
       ),
       initialRoute: 'Home',
       routes: {

@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:notebook/database/index.dart';
 import 'package:notebook/models/note.dart';
+
+import '../store/theme.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,6 +17,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late ThemeProvider theme;
   List notes = [];
   DbHelper dbHelper = DbHelper();
 
@@ -85,16 +90,26 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notebook'),
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Theme.of(context).brightness.name == 'light'
-                ? const Icon(Icons.wb_sunny_rounded)
-                : const Icon(Icons.nightlight_round_sharp),
+            onPressed: () async {
+              theme.changeTheme();
+
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              prefs.setString('theme', theme.themeMode.name);
+            },
+            icon: Icon(
+              theme.themeMode.name == 'light'
+                  ? Icons.wb_sunny_rounded
+                  : Icons.nightlight_round_sharp,
+            ),
           ),
           const SizedBox(width: 5)
         ],
